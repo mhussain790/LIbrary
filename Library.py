@@ -47,6 +47,9 @@ class Patron:
     def get_name(self):
         return self._name
 
+    def get_checked_out_items(self):
+        return self._checked_out_items
+
     def add_library_item(self, library_item):
         self._checked_out_items.append(library_item)
 
@@ -102,7 +105,7 @@ class LibraryItem:
         self._location = "ON_SHELF"
         self._checked_out_by = None
         self._requested_by = None
-        self._date_checked_out = None
+        self._date_checked_out = 0
 
     def get_library_item_id(self):
         return self._library_item_id
@@ -148,18 +151,22 @@ Book: 21 days
 Album: 14 days
 Movie: 7 days.
 
-All three will have an additional field. For Book, it's a string field called author. For Album, it's a string field called artist. For Movie, it's a string field called director. There will also need to be get methods to return the values of these fields.
+All three will have an additional field. 
+For Book, it's a string field called author. 
+For Album, it's a string field called artist. 
+For Movie, it's a string field called director. 
+There will also need to be get methods to return the values of these fields.
 """
 
 
 class Book(LibraryItem):
     def __init__(self, _library_item_id, _title, _author):
         self._author = _author
-        self._date_checked_out = 21
+        self._date_checked_out = None
         super().__init__(_library_item_id, _title)
 
     def get_check_out_length(self):
-        return self._date_checked_out
+        return 21
 
     def author(self):
         return self._author
@@ -168,11 +175,11 @@ class Book(LibraryItem):
 class Album(LibraryItem):
     def __init__(self, _library_item_id, _title, _artist):
         self._artist = _artist
-        self._date_checked_out = 14
+        self._date_checked_out = None
         super().__init__(_library_item_id, _title)
 
     def get_check_out_length(self):
-        return self._date_checked_out
+        return 14
 
     def get_artist(self):
         return self._artist
@@ -181,14 +188,15 @@ class Album(LibraryItem):
 class Movie(LibraryItem):
     def __init__(self, _library_item_id, _title, _director):
         self._director = _director
-        self._date_checked_out = 7
+        self._date_checked_out = None
         super().__init__(_library_item_id, _title)
 
     def get_check_out_length(self):
-        return self._date_checked_out
+        return 7
 
     def get_director(self):
         return self._director
+
 
 """
 LIBRARY CLASS
@@ -338,4 +346,10 @@ class Library:
     def increment_current_date(self):
         self._current_date += 1
         for members in self._members:
-            members.amend_fine(0.10)
+            for items in members.get_checked_out_items():
+                print(items.get_date_checked_out())
+                print(items.get_check_out_length())
+                if Library.get_current_date(self) > items.get_check_out_length():
+                    multiplier = Library.get_current_date(self) - items.get_check_out_length()
+                    print(multiplier)
+                    members.amend_fine(0.10 * multiplier)
