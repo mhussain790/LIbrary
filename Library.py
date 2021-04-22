@@ -345,11 +345,10 @@ class Library:
 
     def increment_current_date(self):
         self._current_date += 1
+
+        # Search through each member's checked out items and find the item which date exceeds
+        # the max check out length for the libraryitem type
         for members in self._members:
             for items in members.get_checked_out_items():
-                print(items.get_date_checked_out())
-                print(items.get_check_out_length())
                 if Library.get_current_date(self) > items.get_check_out_length():
-                    multiplier = Library.get_current_date(self) - items.get_check_out_length()
-                    print(multiplier)
-                    members.amend_fine(0.10 * multiplier)
+                    members.amend_fine(0.10)
